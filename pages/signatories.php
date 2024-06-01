@@ -3,14 +3,13 @@
 if(empty($_SESSION['id'])):
 header('Location:../index.php');
 endif;
-error_reporting(0);
 ?>
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Time Schedule| <?php include('../dist/includes/title.php');?></title>
+    <title>Feedback | <?php include('../dist/includes/title.php');?></title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
@@ -44,45 +43,47 @@ error_reporting(0);
                 <div class="box-body">
 				<div class="row">
 					<div class="col-md-12">
-						<table class="table table-bordered table-striped" style="margin-right:-10px">
+						<table id="example1" class="table table-bordered table-striped" style="margin-right:-10px">
               <thead>
                 <tr>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Day/s</th>
+                <th>Order</th>
+                <th>Name</th>
+                <th>Designation</th>
                 <th>Action</th>
-                
-                
                 </tr>
               </thead>
               
     <?php
+        $id=$_SESSION['id'];
         include('../dist/includes/dbcon.php');
-        $query=mysqli_query($con,"select * from time order by days,time_start")or die(mysqli_error());
+        $query=mysqli_query($con,"select * from signatories natural join member natural join designation where set_by='$id' order by seq")or die(mysqli_error());
           
           while($row=mysqli_fetch_array($query)){
-            $id=$row['time_id'];
-            $start=date("h:i a",strtotime($row['time_start']));
-            $end=date("h:i a",strtotime($row['time_end']));
-            $day=$row['days'];
+            $sid=$row['sign_id'];
+            $name=$row['member_first']." ".$row['member_last'];
+            $designation=$row['designation_name'];
+            $seq=$row['seq'];
+            
     ?>
                 <tr>
-                <td><?php echo $start;?></td>
-                <td><?php echo $end;?></td>
-                <td><?php echo $day;?></td>               
+                <td><?php echo $seq;?></td>
+                <td><?php echo $name;?></td>
+                <td><?php echo $designation;?></td>
                 <td>
-                <a id="removeme" href="time_del.php?id=<?php echo $id;?>">
-                <i class="glyphicon glyphicon-remove text-red"></i></a>
+                  
+                  <a id="removeme" href="signatories_del.php?id=<?php echo $sid;?>">
+                    <i class="glyphicon glyphicon-trash text-red"></i></a>
+                  
                 </td>
         
                 </tr>
 
               
 <?php }?>           
-</table>  
-
+</table> 
 							  
 		</div><!--col end -->
+    <form method="post" action="signatories_save.php">
 		<div class="col-md-6">
 			
 						
@@ -101,43 +102,64 @@ error_reporting(0);
                   <div id="form">
 					
 				  <div class="row">
-            <form method="post" action="time_save.php">
 					 <div class="col-md-12">
-						  <h4>Add Time Schedule</h4>
+              <table style="font-style: italic;">
+                <tr>
+                  <th><h4>Order of signatories</h4></th>
+                </tr>
+                <tr>
+                  <td><b>1</b> Prepared by <b>(Chairperson)</b></td>
+                </tr>
+                <tr>
+                  <td><b>2</b> Recommending Approval <b>(Dean)</b></td>
+                </tr>
+                <tr>
+                  <td><b>3</b> Recommending Approval <b>(VPAA)</b></td>
+                </tr>
+                <tr>
+                  <td><b>4</b> Approved <b>(President)</b></td>
+                </tr>
+              </table><hr>
+              <h4>Add Signatories</h4>
 						  <div class="form-group">
-							<label for="date">Start Time</label><br>
-								<input type="time" class="form-control" name="start" placeholder="Start Time" required>
-								
-						  </div><!-- /.form group -->
-						  <div class="form-group">
-							<label for="date">End Time</label><br>
-								<input type="time" class="form-control" name="end" placeholder="End Time" required>
-								
-						  </div><!-- /.form group -->
-						  <div class="form-group">
-							<label for="date">Day/s</label><br>
-								<select class="form-control select2" name="day" required>
-									<option value="mwf">MWF Class</option>
-									<option value="tth">TTH Class</option>
-									<option value="fst">Exam Sched</option>
+							<label for="date">Name</label>
+							
+								<select class="form-control select2" name="id" required>
+								  <?php 
+                  include('../dist/includes/dbcon.php');
+									$query2=mysqli_query($con,"select * from member order by member_last")or die(mysqli_error($con));
+									  while($row=mysqli_fetch_array($query2)){
+								  ?>
+										<option value="<?php echo $row['member_id'];?>"><?php echo $row['member_first']." ".$row['member_last'];?></option>
+								  <?php }
+									
+								  ?>
 								</select>
+							
 						  </div><!-- /.form group -->
+              <div class="form-group">
+              <label for="date">Sequence</label><br>
+                <input type="number" class="form-control" name="seq" placeholder="Write the order of appearance. (Ex. 1)" required> 
+              </div><!-- /.form group -->
+						 
+						 
+						  
 					</div>
 				  </div>	
                
                   
                   <div class="form-group">
                     
-                      <button class="btn btn-lg btn-block btn-primary" id="daterange-btn" name="save" type="submit">
-                        Save
+                      <button class="btn btn-lg btn-primary" id="daterange-btn" name="save" type="submit">
+                        Send
                       </button>
-					  <button class="btn btn-lg btn-block" id="daterange-btn" type="reset">
+					  <button class="btn btn-lg" id="daterange-btn" type="reset">
                        Cancel
                       </button>
 					  
 					  
                    </div>
-                  </div>
+                  </div><!-- /.form group --><hr>
 				</form>	
                 </div><!-- /.box-body -->
 				
@@ -153,7 +175,12 @@ error_reporting(0);
       </div><!-- /.content-wrapper -->
       <?php include('../dist/includes/footer.php');?>
     </div><!-- ./wrapper -->
-	
+	 
+
+
+
+
+
 	<script type="text/javascript" src="autosum.js"></script>
     <!-- jQuery 2.1.4 -->
     <script src="../plugins/jQuery/jQuery-2.1.4.min.js"></script>

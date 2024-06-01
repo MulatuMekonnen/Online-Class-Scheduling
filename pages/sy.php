@@ -10,7 +10,7 @@ error_reporting(0);
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Time Schedule| <?php include('../dist/includes/title.php');?></title>
+    <title>Settings | <?php include('../dist/includes/title.php');?></title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
@@ -40,47 +40,11 @@ error_reporting(0);
             <div class="row">
 	      <div class="col-md-9">
               <div class="box box-warning">
-               
+               <form method="post" id="reg-form">
                 <div class="box-body">
 				<div class="row">
 					<div class="col-md-12">
-						<table class="table table-bordered table-striped" style="margin-right:-10px">
-              <thead>
-                <tr>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Day/s</th>
-                <th>Action</th>
-                
-                
-                </tr>
-              </thead>
-              
-    <?php
-        include('../dist/includes/dbcon.php');
-        $query=mysqli_query($con,"select * from time order by days,time_start")or die(mysqli_error());
-          
-          while($row=mysqli_fetch_array($query)){
-            $id=$row['time_id'];
-            $start=date("h:i a",strtotime($row['time_start']));
-            $end=date("h:i a",strtotime($row['time_end']));
-            $day=$row['days'];
-    ?>
-                <tr>
-                <td><?php echo $start;?></td>
-                <td><?php echo $end;?></td>
-                <td><?php echo $day;?></td>               
-                <td>
-                <a id="removeme" href="time_del.php?id=<?php echo $id;?>">
-                <i class="glyphicon glyphicon-remove text-red"></i></a>
-                </td>
-        
-                </tr>
-
-              
-<?php }?>           
-</table>  
-
+						<div class="result" id="form"></div>
 							  
 		</div><!--col end -->
 		<div class="col-md-6">
@@ -101,26 +65,12 @@ error_reporting(0);
                   <div id="form">
 					
 				  <div class="row">
-            <form method="post" action="time_save.php">
 					 <div class="col-md-12">
-						  <h4>Add Time Schedule</h4>
+						  
 						  <div class="form-group">
-							<label for="date">Start Time</label><br>
-								<input type="time" class="form-control" name="start" placeholder="Start Time" required>
+							<label for="date">Add School Year</label><br>
+								<input type="text" class="form-control" name="sy" placeholder="School Year" required>
 								
-						  </div><!-- /.form group -->
-						  <div class="form-group">
-							<label for="date">End Time</label><br>
-								<input type="time" class="form-control" name="end" placeholder="End Time" required>
-								
-						  </div><!-- /.form group -->
-						  <div class="form-group">
-							<label for="date">Day/s</label><br>
-								<select class="form-control select2" name="day" required>
-									<option value="mwf">MWF Class</option>
-									<option value="tth">TTH Class</option>
-									<option value="fst">Exam Sched</option>
-								</select>
 						  </div><!-- /.form group -->
 					</div>
 				  </div>	
@@ -137,10 +87,10 @@ error_reporting(0);
 					  
 					  
                    </div>
-                  </div>
+                  </div><!-- /.form group -->
 				</form>	
+                				
                 </div><!-- /.box-body -->
-				
               </div><!-- /.box -->
             </div><!-- /.col (right) -->
 			
@@ -153,7 +103,36 @@ error_reporting(0);
       </div><!-- /.content-wrapper -->
       <?php include('../dist/includes/footer.php');?>
     </div><!-- ./wrapper -->
+	<script>
+		$(document).ready(function(){
+
+		$(".result").load("sy_list.php");
+		
+
+	});
+	//--------------------
 	
+	
+	</script>
+	
+	<script type="text/javascript">
+		$("#reg-form").on('submit', function()
+		 {  
+		  $.post('sy_save.php', $(this).serialize(), function(data)
+		  {
+		   //$(".result").html(data);  
+			$(".result").load("sy_list.php");
+		  });
+		  
+		  return false;
+		  
+		
+		})
+		
+		//-------------------------------------------------------------
+		
+</script>
+
 	<script type="text/javascript" src="autosum.js"></script>
     <!-- jQuery 2.1.4 -->
     <script src="../plugins/jQuery/jQuery-2.1.4.min.js"></script>

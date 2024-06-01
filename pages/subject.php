@@ -1,16 +1,15 @@
-
  <?php session_start();
 if(empty($_SESSION['id'])):
 header('Location:../index.php');
 endif;
-error_reporting(0);
+//error_reporting(0);
 ?>
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Time Schedule| <?php include('../dist/includes/title.php');?></title>
+    <title>Subject | <?php include('../dist/includes/title.php');?></title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
@@ -44,12 +43,11 @@ error_reporting(0);
                 <div class="box-body">
 				<div class="row">
 					<div class="col-md-12">
-						<table class="table table-bordered table-striped" style="margin-right:-10px">
+						<table id="example1" class="table table-bordered table-striped" style="margin-right:-10px">
               <thead>
                 <tr>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Day/s</th>
+                <th>Subject Code</th>
+                <th>Subject Title</th>
                 <th>Action</th>
                 
                 
@@ -57,22 +55,31 @@ error_reporting(0);
               </thead>
               
     <?php
+        session_start();
+        $member=$_SESSION['id'];
         include('../dist/includes/dbcon.php');
-        $query=mysqli_query($con,"select * from time order by days,time_start")or die(mysqli_error());
+        $query=mysqli_query($con,"select * from subject order by subject_code")or die(mysqli_error());
           
           while($row=mysqli_fetch_array($query)){
-            $id=$row['time_id'];
-            $start=date("h:i a",strtotime($row['time_start']));
-            $end=date("h:i a",strtotime($row['time_end']));
-            $day=$row['days'];
+            $id=$row['subject_id'];
+            $code=$row['subject_code'];
+            $title=$row['subject_title'];
+            $mid=$row['member_id'];
     ?>
                 <tr>
-                <td><?php echo $start;?></td>
-                <td><?php echo $end;?></td>
-                <td><?php echo $day;?></td>               
+                <td><?php echo $code;?></td>
+                <td><?php echo $title;?></td> 
                 <td>
-                <a id="removeme" href="time_del.php?id=<?php echo $id;?>">
-                <i class="glyphicon glyphicon-remove text-red"></i></a>
+                <?php 
+                  if ($member==$mid)  
+                    {
+                      echo "  
+                        <a id='click' href='subject.php?id=$id&code=$code&title=$title'>
+                          <i class='glyphicon glyphicon-edit text-blue'></i></a>
+                        <a id='removeme' href='subject_del.php?id=$id'>
+                          <i class='glyphicon glyphicon-remove text-red'></i></a>";
+                  }
+                ?>
                 </td>
         
                 </tr>
@@ -80,7 +87,6 @@ error_reporting(0);
               
 <?php }?>           
 </table>  
-
 							  
 		</div><!--col end -->
 		<div class="col-md-6">
@@ -93,7 +99,7 @@ error_reporting(0);
                 </div><!-- /.box-body -->
               </div><!-- /.box -->
             </div><!-- /.col (right) -->
-            
+            <form method="post" action="subject_save.php">
             <div class="col-md-3">
               <div class="box box-warning">
                 <div class="box-body">
@@ -101,26 +107,12 @@ error_reporting(0);
                   <div id="form">
 					
 				  <div class="row">
-            <form method="post" action="time_save.php">
 					 <div class="col-md-12">
-						  <h4>Add Time Schedule</h4>
+						  
 						  <div class="form-group">
-							<label for="date">Start Time</label><br>
-								<input type="time" class="form-control" name="start" placeholder="Start Time" required>
-								
-						  </div><!-- /.form group -->
-						  <div class="form-group">
-							<label for="date">End Time</label><br>
-								<input type="time" class="form-control" name="end" placeholder="End Time" required>
-								
-						  </div><!-- /.form group -->
-						  <div class="form-group">
-							<label for="date">Day/s</label><br>
-								<select class="form-control select2" name="day" required>
-									<option value="mwf">MWF Class</option>
-									<option value="tth">TTH Class</option>
-									<option value="fst">Exam Sched</option>
-								</select>
+							<label for="date">Add Subject</label><br>
+								<input type="text" class="form-control" name="code" placeholder="Subject Code" required>
+								<input type="text" class="form-control" name="title" placeholder="Subject Title" required>
 						  </div><!-- /.form group -->
 					</div>
 				  </div>	
@@ -137,10 +129,38 @@ error_reporting(0);
 					  
 					  
                    </div>
-                  </div>
+                  </div><!-- /.form group --><hr>
 				</form>	
                 </div><!-- /.box-body -->
+				<div class="box-body" style="" id="displayform">
+                  <!-- Date range -->
+                  <div id="form">
+					
+				  <div class="row">
+					 <div class="col-md-12">
+						  <form method="post" action="subject_update.php">
+						  <div class="form-group">
+							<label for="date">Update Subject</label><br>
+                <input type="hidden" class="form-control" id="id" name="id" value="<?php echo $_REQUEST['id'];?>">
+								<input type="text" class="form-control" id="code" name="code" value="<?php echo $_REQUEST['code'];?>" placeholder="Subject Code">
+								<input type="text" class="form-control" id="class" name="title" value="<?php echo $_REQUEST['title'];?>" placeholder="Subject Title" required>
+						  </div><!-- /.form group -->
+					</div>
+				  </div>	
+               
+                  
+                  <div class="form-group">
+                    
+                      <button class="btn btn-lg btn-block btn-primary" id="daterange-btn" name="save" type="submit">
+                        Update
+                      </button>
+					  
+					  </form>
+					  
+                   </div>
+                  </div><!-- /.form group --><hr>
 				
+                </div><!-- /.box-body -->
               </div><!-- /.box -->
             </div><!-- /.col (right) -->
 			
@@ -154,8 +174,6 @@ error_reporting(0);
       <?php include('../dist/includes/footer.php');?>
     </div><!-- ./wrapper -->
 	
-	<script type="text/javascript" src="autosum.js"></script>
-    <!-- jQuery 2.1.4 -->
     <script src="../plugins/jQuery/jQuery-2.1.4.min.js"></script>
 	<script src="../dist/js/jquery.min.js"></script>
     <!-- Bootstrap 3.3.5 -->

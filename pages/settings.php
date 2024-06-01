@@ -1,5 +1,4 @@
-
- <?php session_start();
+<?php session_start();
 if(empty($_SESSION['id'])):
 header('Location:../index.php');
 endif;
@@ -10,7 +9,7 @@ error_reporting(0);
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Time Schedule| <?php include('../dist/includes/title.php');?></title>
+    <title>Settings | <?php include('../dist/includes/title.php');?></title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
@@ -47,9 +46,10 @@ error_reporting(0);
 						<table class="table table-bordered table-striped" style="margin-right:-10px">
               <thead>
                 <tr>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Day/s</th>
+                <th>Term</th>
+                <th>Semester</th>
+                <th>School Year</th>
+                <th>Status</th>
                 <th>Action</th>
                 
                 
@@ -58,21 +58,27 @@ error_reporting(0);
               
     <?php
         include('../dist/includes/dbcon.php');
-        $query=mysqli_query($con,"select * from time order by days,time_start")or die(mysqli_error());
+        $query=mysqli_query($con,"select * from settings order by sy desc")or die(mysqli_error());
           
           while($row=mysqli_fetch_array($query)){
-            $id=$row['time_id'];
-            $start=date("h:i a",strtotime($row['time_start']));
-            $end=date("h:i a",strtotime($row['time_end']));
-            $day=$row['days'];
+            $id=$row['settings_id'];
+            $sem=$row['sem'];
+            $term=$row['term'];
+            $sy=$row['sy'];
+            $status=$row['status'];
+            if ($status=="active") $flag="success"; else $flag="danger";
+            
     ?>
                 <tr>
-                <td><?php echo $start;?></td>
-                <td><?php echo $end;?></td>
-                <td><?php echo $day;?></td>               
+                <td><?php echo $term;?></td>
+                <td><?php echo $sem;?></td>
+                <td><?php echo $sy;?></td>  
+                <td><span class="label label-<?php echo $flag;?>"><?php echo $status;?></span></td>   
                 <td>
-                <a id="removeme" href="time_del.php?id=<?php echo $id;?>">
-                <i class="glyphicon glyphicon-remove text-red"></i></a>
+                <a id="removeme" href="activate.php?id=<?php echo $id;?>">
+                Set</a>
+                <a id="removeme" href="settings_del.php?id=<?php echo $id;?>">
+                <i class="glyphicon glyphicon-trash text-red"></i></a>
                 </td>
         
                 </tr>
@@ -101,26 +107,29 @@ error_reporting(0);
                   <div id="form">
 					
 				  <div class="row">
-            <form method="post" action="time_save.php">
 					 <div class="col-md-12">
-						  <h4>Add Time Schedule</h4>
+						  <h3>Add Settings</h3>
+						  <form method="post" action="settings_save.php">
 						  <div class="form-group">
-							<label for="date">Start Time</label><br>
-								<input type="time" class="form-control" name="start" placeholder="Start Time" required>
-								
-						  </div><!-- /.form group -->
-						  <div class="form-group">
-							<label for="date">End Time</label><br>
-								<input type="time" class="form-control" name="end" placeholder="End Time" required>
-								
-						  </div><!-- /.form group -->
-						  <div class="form-group">
-							<label for="date">Day/s</label><br>
-								<select class="form-control select2" name="day" required>
-									<option value="mwf">MWF Class</option>
-									<option value="tth">TTH Class</option>
-									<option value="fst">Exam Sched</option>
+							<label for="date">Semester</label><br>
+								<select class="form-control select2" style="width: 100%;" name="sem" required>
+									<option>1st</option>
+									<option>2nd</option>
+									<option>Summer</option>
 								</select>
+						  </div><!-- /.form group -->
+						  <div class="form-group">
+							<label for="date">School Year</label><br>
+								<select class="form-control select2" style="width: 100%;" name="sy" required>
+							<?php
+							 include('../dist/includes/dbcon.php');
+								$query2=mysqli_query($con,"select * from sy order by sy desc")or die(mysqli_error());
+								  while($row2=mysqli_fetch_array($query2)){
+							  ?>
+									<option><?php echo $row2['sy'];?></option>
+							  <?php }?>
+									</select>
+								
 						  </div><!-- /.form group -->
 					</div>
 				  </div>	
@@ -128,17 +137,39 @@ error_reporting(0);
                   
                   <div class="form-group">
                     
-                      <button class="btn btn-lg btn-block btn-primary" id="daterange-btn" name="save" type="submit">
+                      <button class="btn btn-lg btn-primary" id="daterange-btn" name="save" type="submit">
                         Save
                       </button>
-					  <button class="btn btn-lg btn-block" id="daterange-btn" type="reset">
+					  <button class="btn btn-lg" id="daterange-btn" type="reset">
                        Cancel
                       </button>
 					  
 					  
                    </div>
-                  </div>
+                  </div><!-- /.form group --><hr>
 				</form>	
+        <form method="post" action="term.php">
+              <h3>Set Term</h3>
+              <div class="form-group">
+                  <label for="date">Term</label><br>
+                    <select class="form-control select2" style="width: 100%;" name="term" required>
+                      <option>Midterm</option>
+                      <option>Endterm</option>
+                    </select>
+                  </div><!-- /.form group -->
+                   <div class="form-group">
+                    
+                      <button class="btn btn-lg btn-primary" id="daterange-btn" name="save" type="submit">
+                        Set
+                      </button>
+                      <button class="btn btn-lg" id="daterange-btn" type="reset">
+                       Cancel
+                      </button>
+            
+            
+                   </div>
+                  </div><!-- /.form group --><hr>
+        </form>
                 </div><!-- /.box-body -->
 				
               </div><!-- /.box -->
@@ -154,6 +185,7 @@ error_reporting(0);
       <?php include('../dist/includes/footer.php');?>
     </div><!-- ./wrapper -->
 	
+
 	<script type="text/javascript" src="autosum.js"></script>
     <!-- jQuery 2.1.4 -->
     <script src="../plugins/jQuery/jQuery-2.1.4.min.js"></script>

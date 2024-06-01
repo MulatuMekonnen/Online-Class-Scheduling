@@ -1,5 +1,4 @@
-
- <?php session_start();
+<?php session_start();
 if(empty($_SESSION['id'])):
 header('Location:../index.php');
 endif;
@@ -10,7 +9,7 @@ error_reporting(0);
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Time Schedule| <?php include('../dist/includes/title.php');?></title>
+    <title>Program | <?php include('../dist/includes/title.php');?></title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
@@ -44,12 +43,11 @@ error_reporting(0);
                 <div class="box-body">
 				<div class="row">
 					<div class="col-md-12">
-						<table class="table table-bordered table-striped" style="margin-right:-10px">
+						<table id="example1" class="table table-bordered table-striped" style="margin-right:-10px">
               <thead>
                 <tr>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Day/s</th>
+                <th>Program Code</th>
+                <th>Program Title</th>
                 <th>Action</th>
                 
                 
@@ -58,20 +56,19 @@ error_reporting(0);
               
     <?php
         include('../dist/includes/dbcon.php');
-        $query=mysqli_query($con,"select * from time order by days,time_start")or die(mysqli_error());
+        $query=mysqli_query($con,"select * from program order by prog_code")or die(mysqli_error());
           
           while($row=mysqli_fetch_array($query)){
-            $id=$row['time_id'];
-            $start=date("h:i a",strtotime($row['time_start']));
-            $end=date("h:i a",strtotime($row['time_end']));
-            $day=$row['days'];
+            $id=$row['prog_id'];
+            $code=$row['prog_code'];
+            $name=$row['prog_title'];
     ?>
                 <tr>
-                <td><?php echo $start;?></td>
-                <td><?php echo $end;?></td>
-                <td><?php echo $day;?></td>               
-                <td>
-                <a id="removeme" href="time_del.php?id=<?php echo $id;?>">
+                <td><?php echo $code;?></td>
+                 <td><?php echo $name;?></td>
+                <td><a id="click" href="program.php?id=<?php echo $id;?>&code=<?php echo $code;?>&name=<?php echo $name;?>">
+                <i class="glyphicon glyphicon-edit text-blue"></i></a>
+                <a id="removeme" href="program_del.php?id=<?php echo $id;?>">
                 <i class="glyphicon glyphicon-remove text-red"></i></a>
                 </td>
         
@@ -79,8 +76,7 @@ error_reporting(0);
 
               
 <?php }?>           
-</table>  
-
+</table> 
 							  
 		</div><!--col end -->
 		<div class="col-md-6">
@@ -101,26 +97,17 @@ error_reporting(0);
                   <div id="form">
 					
 				  <div class="row">
-            <form method="post" action="time_save.php">
 					 <div class="col-md-12">
-						  <h4>Add Time Schedule</h4>
+						  <form method="post" action="program_save.php">
 						  <div class="form-group">
-							<label for="date">Start Time</label><br>
-								<input type="time" class="form-control" name="start" placeholder="Start Time" required>
+							<label for="date">Add Program Code</label><br>
+								<input type="text" class="form-control" name="code" placeholder="Program Code" required>
 								
 						  </div><!-- /.form group -->
-						  <div class="form-group">
-							<label for="date">End Time</label><br>
-								<input type="time" class="form-control" name="end" placeholder="End Time" required>
+						    <div class="form-group">
+							<label for="date">Program Title</label><br>
+								<input type="text" class="form-control" name="name" placeholder="Program Title" required>
 								
-						  </div><!-- /.form group -->
-						  <div class="form-group">
-							<label for="date">Day/s</label><br>
-								<select class="form-control select2" name="day" required>
-									<option value="mwf">MWF Class</option>
-									<option value="tth">TTH Class</option>
-									<option value="fst">Exam Sched</option>
-								</select>
 						  </div><!-- /.form group -->
 					</div>
 				  </div>	
@@ -137,10 +124,39 @@ error_reporting(0);
 					  
 					  
                    </div>
-                  </div>
+                  </div><!-- /.form group -->
 				</form>	
+				<div id="form">
+					
+				  <div class="row">
+					 <div class="col-md-12">
+						  <form method="post" action="program_update.php">
+						  <div class="form-group">
+							<label for="date">Update <br> Program Code</label><br>
+								<input type="hidden" class="form-control" id="id" name="id" value="<?php echo $_REQUEST['id'];?>" readonly>
+								<input type="text" class="form-control" id="class" name="code" value="<?php echo $_REQUEST['code'];?>" placeholder="Department Code" required>
+						  </div><!-- /.form group -->
+						  <div class="form-group">
+							<label for="date">Program Name</label><br>
+								
+								<input type="text" class="form-control" id="class" name="name" value="<?php echo $_REQUEST['name'];?>" placeholder="Department Name" required>
+						  </div><!-- /.form group -->
+					</div>
+				  </div>	
+               
+                  
+                  <div class="form-group">
+                    
+                      <button class="btn btn-lg btn-block btn-primary" id="daterange-btn" name="save" type="submit">
+                        Update
+                      </button>
+					  
+					  </form>
+					  
+                   </div>
+                  </div><!-- /.form group --><hr>
+                				
                 </div><!-- /.box-body -->
-				
               </div><!-- /.box -->
             </div><!-- /.col (right) -->
 			

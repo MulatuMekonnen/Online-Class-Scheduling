@@ -1,5 +1,4 @@
-
- <?php session_start();
+<?php session_start();
 if(empty($_SESSION['id'])):
 header('Location:../index.php');
 endif;
@@ -10,7 +9,7 @@ error_reporting(0);
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Time Schedule| <?php include('../dist/includes/title.php');?></title>
+    <title>Salutation | <?php include('../dist/includes/title.php');?></title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
@@ -44,12 +43,11 @@ error_reporting(0);
                 <div class="box-body">
 				<div class="row">
 					<div class="col-md-12">
-						<table class="table table-bordered table-striped" style="margin-right:-10px">
+						
+<table class="table table-bordered table-striped" style="margin-right:-10px">
               <thead>
                 <tr>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Day/s</th>
+                <th>Salutation</th>
                 <th>Action</th>
                 
                 
@@ -58,20 +56,19 @@ error_reporting(0);
               
     <?php
         include('../dist/includes/dbcon.php');
-        $query=mysqli_query($con,"select * from time order by days,time_start")or die(mysqli_error());
+        $query=mysqli_query($con,"select * from salut order by salut")or die(mysqli_error());
           
           while($row=mysqli_fetch_array($query)){
-            $id=$row['time_id'];
-            $start=date("h:i a",strtotime($row['time_start']));
-            $end=date("h:i a",strtotime($row['time_end']));
-            $day=$row['days'];
+            $id=$row['salut_id'];
+            $salut=$row['salut'];
     ?>
                 <tr>
-                <td><?php echo $start;?></td>
-                <td><?php echo $end;?></td>
-                <td><?php echo $day;?></td>               
+                <td><?php echo $salut;?></td>
+                 
                 <td>
-                <a id="removeme" href="time_del.php?id=<?php echo $id;?>">
+                <a id="click" href="salut.php?id=<?php echo $id;?>&salut=<?php echo $salut;?>">
+                <i class="glyphicon glyphicon-edit text-blue"></i></a>
+                <a id="removeme" href="salut_del.php?id=<?php echo $id;?>">
                 <i class="glyphicon glyphicon-remove text-red"></i></a>
                 </td>
         
@@ -101,26 +98,12 @@ error_reporting(0);
                   <div id="form">
 					
 				  <div class="row">
-            <form method="post" action="time_save.php">
 					 <div class="col-md-12">
-						  <h4>Add Time Schedule</h4>
+						  <form method="post" action="salut_save.php">
 						  <div class="form-group">
-							<label for="date">Start Time</label><br>
-								<input type="time" class="form-control" name="start" placeholder="Start Time" required>
+							<label for="date">Add Salutation</label><br>
+								<input type="text" class="form-control" name="salut" placeholder="Salutation" required>
 								
-						  </div><!-- /.form group -->
-						  <div class="form-group">
-							<label for="date">End Time</label><br>
-								<input type="time" class="form-control" name="end" placeholder="End Time" required>
-								
-						  </div><!-- /.form group -->
-						  <div class="form-group">
-							<label for="date">Day/s</label><br>
-								<select class="form-control select2" name="day" required>
-									<option value="mwf">MWF Class</option>
-									<option value="tth">TTH Class</option>
-									<option value="fst">Exam Sched</option>
-								</select>
 						  </div><!-- /.form group -->
 					</div>
 				  </div>	
@@ -128,19 +111,43 @@ error_reporting(0);
                   
                   <div class="form-group">
                     
-                      <button class="btn btn-lg btn-block btn-primary" id="daterange-btn" name="save" type="submit">
+                      <button class="btn btn-lg btn-primary" id="daterange-btn" name="save" type="submit">
                         Save
                       </button>
-					  <button class="btn btn-lg btn-block" id="daterange-btn" type="reset">
+					  <button class="btn btn-lg" id="daterange-btn" type="reset">
                        Cancel
                       </button>
 					  
 					  
                    </div>
-                  </div>
+                  </div><!-- /.form group -->
 				</form>	
+				<div id="form">
+					
+				  <div class="row">
+					 <div class="col-md-12">
+						  <form method="post" action="salut_update.php">
+						  <div class="form-group">
+							<label for="date">Update Class</label><br>
+								<input type="hidden" class="form-control" id="id" name="id" value="<?php echo $_REQUEST['id'];?>" readonly>
+								<input type="text" class="form-control" id="class" name="salut" value="<?php echo $_REQUEST['salut'];?>" placeholder="Salutation" required>
+						  </div><!-- /.form group -->
+					</div>
+				  </div>	
+               
+                  
+                  <div class="form-group">
+                    
+                      <button class="btn btn-lg btn-primary" id="daterange-btn" name="save" type="submit">
+                        Update
+                      </button>
+					  
+					  </form>
+					  
+                   </div>
+                  </div><!-- /.form group --><hr>
+                				
                 </div><!-- /.box-body -->
-				
               </div><!-- /.box -->
             </div><!-- /.col (right) -->
 			
