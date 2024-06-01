@@ -1,123 +1,74 @@
-<?php
-session_start();
-error_reporting(0);
-include('includes/config.php');
-if($_SESSION['login']!=''){
-$_SESSION['login']='';
-}
-if(isset($_POST['login']))
-{
-  //code for captach verification
-if ($_POST["vercode"] != $_SESSION["vercode"] OR $_SESSION["vercode"]=='')  {
-        echo "<script>alert('Incorrect verification code');</script>" ;
-    } 
-        else {
-$email=$_POST['emailid'];
-$password=md5($_POST['password']);
-$sql ="SELECT EmailId,Password,StudentId,Status FROM tblstudents WHERE EmailId=:email and Password=:password";
-$query= $dbh -> prepare($sql);
-$query-> bindParam(':email', $email, PDO::PARAM_STR);
-$query-> bindParam(':password', $password, PDO::PARAM_STR);
-$query-> execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-
-if($query->rowCount() > 0)
-{
- foreach ($results as $result) {
- $_SESSION['stdid']=$result->StudentId;
-if($result->Status==1)
-{
-$_SESSION['login']=$_POST['emailid'];
-echo "<script type='text/javascript'> document.location ='dashboard.php'; </script>";
-} else {
-echo "<script>alert('Your Account Has been blocked .Please contact admin');</script>";
-
-}
-}
-
-} 
-
-else{
-echo "<script>alert('Invalid Details');</script>";
-}
-}
-}
-?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    <title>Online Library Management System | </title>
-    <!-- BOOTSTRAP CORE STYLE  -->
-    <link href="assets/css/bootstrap.css" rel="stylesheet" />
-    <!-- FONT AWESOME STYLE  -->
-    <link href="assets/css/font-awesome.css" rel="stylesheet" />
-    <!-- CUSTOM STYLE  -->
-    <link href="assets/css/style.css" rel="stylesheet" />
-    <!-- GOOGLE FONT -->
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Login - <?php include('dist/includes/title.php');?></title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.5 -->
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    
+    <!-- Font Awesome -->
+    <!-- Theme style -->
+    <link rel="stylesheet" href="dist/css/AdminLTE.min.css">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+         folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="dist/css/skins/_all-skins.min.css">
 
-</head>
-<body>
-    <!------MENU SECTION START-->
-<?php include('includes/header.php');?>
-<!-- MENU SECTION END-->
-<div class="content-wrapper">
-<div class="container">
-<div class="row pad-botm">
-<div class="col-md-12">
-<h4 class="header-line">USER LOGIN FORM</h4>
-</div>
-</div>
-             
-<!--LOGIN PANEL START-->           
-<div class="row">
-<div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3" >
-<div class="panel panel-info">
-<div class="panel-heading">
- LOGIN FORM
-</div>
-<div class="panel-body">
-<form role="form" method="post">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+  <body class="hold-transition login-page" style="background:#ffbb22">
+   
+    <div class="login-box">
+      <div class="login-logo">
+        <h1>SCHEDULING SYSTEM</h1>
+      </div><!-- /.login-logo -->
+      <div class="login-box-body">
+        <p class="login-box-msg">Sign in to start your session</p>
+        <form action="login.php" method="post">
+          <div class="form-group has-feedback">
+            <input type="text" class="form-control" placeholder="Username" name="username">
+            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+          </div>
+          <div class="form-group has-feedback">
+            <input type="password" class="form-control" placeholder="Password" name="password">
+            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+          </div>
+          <div class="row">
+			<div class="col-xs-6 pull-right">
+			  <button type="reset" class="btn btn-block btn-flat">Clear</button>
+            </div><!-- /.col -->
+			<div class="col-xs-6 pull-right">
+              <button type="submit" class="btn btn-primary btn-block btn-flat" name="login" default>Sign In</button>
+            </div><!-- /.col -->
+          </div>
+        </form>
 
-<div class="form-group">
-<label>Enter Email id</label>
-<input class="form-control" type="text" name="emailid" required autocomplete="off" />
-</div>
-<div class="form-group">
-<label>Password</label>
-<input class="form-control" type="password" name="password" required autocomplete="off"  />
-<p class="help-block"><a href="user-forgot-password.php">Forgot Password</a></p>
-</div>
+        
 
- <div class="form-group">
-<label>Verification code : </label>
-<input type="text" class="form-control1"  name="vercode" maxlength="5" autocomplete="off" required  style="height:25px;" />&nbsp;<img src="captcha.php?<?php echo time(); ?>">
->
-</div> 
-
- <button type="submit" name="login" class="btn btn-info">LOGIN </button> | <a href="signup.php">Not Register Yet</a>
-</form>
- </div>
-</div>
-</div>
-</div>  
-<!---LOGIN PANEL END-->            
-             
- 
-    </div>
-    </div>
-     <!-- CONTENT-WRAPPER SECTION END-->
- <?php include('includes/footer.php');?>
-      <!-- FOOTER SECTION END-->
-    <script src="assets/js/jquery-1.10.2.js"></script>
-    <!-- BOOTSTRAP SCRIPTS  -->
-    <script src="assets/js/bootstrap.js"></script>
-      <!-- CUSTOM SCRIPTS  -->
-    <script src="assets/js/custom.js"></script>
-
-</body>
+      </div><!-- /.login-box-body -->
+    </div><!-- /.login-box -->
+      
+           
+   
+<!-- jQuery 2.1.4 -->
+    <script src="plugins/jQuery/jQuery-2.1.4.min.js"></script>
+    <!-- Bootstrap 3.3.5 -->
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <!-- SlimScroll -->
+    <script src="plugins/slimScroll/jquery.slimscroll.min.js"></script>
+    <!-- FastClick -->
+    <script src="plugins/fastclick/fastclick.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="dist/js/app.min.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="dist/js/demo.js"></script>
+  </body>
 </html>
